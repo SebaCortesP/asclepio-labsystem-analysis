@@ -1,5 +1,6 @@
 package com.duoc.asclepio.controller;
-import com.duoc.asclepio.dto.ApiResponse;
+
+import com.duoc.asclepio.dto.*;
 import com.duoc.asclepio.models.Lab;
 import com.duoc.asclepio.repository.LabRepository;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/labs")
@@ -20,47 +22,65 @@ public class LabController {
 
     // Crear laboratorio
     @PostMapping
-    public ResponseEntity<ApiResponse<Lab>> createLab(@RequestBody Lab lab) {
-        if (labRepository.existsByName(lab.getName())) {
+    public ResponseEntity<ApiResponse<LabDTO>> createLab(@RequestBody LabRequestDTO dto) {
+        if (labRepository.existsByName(dto.getName())) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, "El laboratorio ya existe", null));
         }
+
+        Lab lab = new Lab();
+        lab.setName(dto.getName());
+        lab.setAddress(dto.getAddress());
+        lab.setPhone(dto.getPhone());
+
         Lab saved = labRepository.save(lab);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio creado correctamente", saved));
+
+        LabDTO response = new LabDTO(saved.getId(), saved.getName(), saved.getAddress(), saved.getPhone());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio creado correctamente", response));
     }
 
     // Obtener todos los laboratorios
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Lab>>> getAllLabs() {
-        List<Lab> labs = labRepository.findAll();
+    public ResponseEntity<ApiResponse<List<LabDTO>>> getAllLabs() {
+        List<LabDTO> labs = labRepository.findAll().stream()
+                .map(l -> new LabDTO(l.getId(), l.getName(), l.getAddress(), l.getPhone()))
+                .collect(Collectors.toList());
+
         return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorios obtenidos", labs));
     }
 
     // Obtener laboratorio por ID
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Lab>> getLabById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<LabDTO>> getLabById(@PathVariable Long id) {
         Optional<Lab> labOpt = labRepository.findById(id);
         if (labOpt.isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, "Laboratorio no encontrado", null));
         }
-        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio obtenido", labOpt.get()));
+
+        Lab lab = labOpt.get();
+        LabDTO dto = new LabDTO(lab.getId(), lab.getName(), lab.getAddress(), lab.getPhone());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio obtenido", dto));
     }
 
     // Actualizar laboratorio
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Lab>> updateLab(@PathVariable Long id, @RequestBody Lab lab) {
+    public ResponseEntity<ApiResponse<LabDTO>> updateLab(@PathVariable Long id, @RequestBody LabRequestDTO dto) {
         Optional<Lab> labOpt = labRepository.findById(id);
         if (labOpt.isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, "Laboratorio no encontrado", null));
         }
-        Lab existingLab = labOpt.get();
-        existingLab.setName(lab.getName());
-        existingLab.setAddress(lab.getAddress());
-        existingLab.setPhone(lab.getPhone());
-        Lab updatedLab = labRepository.save(existingLab);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio actualizado", updatedLab));
+
+        Lab lab = labOpt.get();
+        lab.setName(dto.getName());
+        lab.setAddress(dto.getAddress());
+        lab.setPhone(dto.getPhone());
+
+        Lab updated = labRepository.save(lab);
+
+        LabDTO response = new LabDTO(updated.getId(), updated.getName(), updated.getAddress(), updated.getPhone());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Laboratorio actualizado", response));
     }
 
     // Eliminar laboratorio

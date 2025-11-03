@@ -1,4 +1,6 @@
 package com.duoc.asclepio.models;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -16,15 +18,21 @@ public class Analysis {
     @SequenceGenerator(name = "analysis_seq", sequenceName = "analysis_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false)
     @NotBlank(message = "El nombre del análisis es obligatorio")
+    @Column(nullable = false)
     private String name;
 
     private String description;
 
     private Double price;
 
-    // Relación muchos a uno con laboratorio
+    // Relación con paciente
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pacient_id")
+    @JsonBackReference
+    private Pacient pacient;
+
+    // Relación con laboratorio
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lab_id", nullable = false)
     private Lab lab;
