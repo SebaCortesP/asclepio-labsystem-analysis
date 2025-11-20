@@ -9,11 +9,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class PacientDTO {
     private Long id;
+    private Long userId;
     private String firstName;
     private String lastName;
     private String email;
     private LocalDate birthDate;
     private String phone;
-    private Long userId;
     private String address;
 }
