@@ -19,39 +19,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ResultService {
 
-    private final ResultRepository resultRepository;
-    private final PacientRepository pacientRepository;
-    private final AnalysisRepository analysisRepository;
-    private final LabRepository labRepository;
+        private final ResultRepository resultRepository;
+        private final AnalysisRepository analysisRepository;
+        private final LabRepository labRepository;
+        public ResultDTO create(ResultCreateDTO dto) {
+                Analysis analysis = analysisRepository.findById(dto.getAnalysisId())
+                        .orElseThrow(() -> new RuntimeException("Análisis no encontrado"));
 
-    public ResultDTO create(ResultCreateDTO dto) {
+                Lab lab = labRepository.findById(dto.getLabId())
+                        .orElseThrow(() -> new RuntimeException("Laboratorio no encontrado"));
 
-        Pacient pacient = pacientRepository.findById(dto.getPacientId())
-                .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                Result r = new Result();
+                r.setUserId(dto.getPacientId());  // <-- ESTE ES EL ID EXTERNO
+                r.setAnalysis(analysis);
+                r.setLab(lab);
+                r.setResultValue(dto.getResultValue());
+                r.setResultDetails(dto.getResultDetails());
+                r.setResultDate(dto.getResultDate());
 
-        Analysis analysis = analysisRepository.findById(dto.getAnalysisId())
-                .orElseThrow(() -> new RuntimeException("Análisis no encontrado"));
+                resultRepository.save(r);
 
-        Lab lab = labRepository.findById(dto.getLabId())
-                .orElseThrow(() -> new RuntimeException("Laboratorio no encontrado"));
+                return ResultDTO.fromEntity(r);
+        }
 
-        Result r = new Result();
-        r.setPacient(pacient);
-        r.setAnalysis(analysis);
-        r.setLab(lab);
-        r.setResultValue(dto.getResultValue());
-        r.setResultDetails(dto.getResultDetails());
-        r.setResultDate(dto.getResultDate());
-
-        resultRepository.save(r);
-
-        return new ResultDTO(
-                r.getId(),
-                analysis.getName(),
-                lab.getName(),
-                r.getResultValue(),
-                r.getResultDetails(),
-                r.getResultDate()
-        );
-    }
 }

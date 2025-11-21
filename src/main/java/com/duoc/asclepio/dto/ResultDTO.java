@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor @AllArgsConstructor
 public class ResultDTO {
     private Long id;
+    private Long userId; 
     private String analysisName;
     private String labName;
     private String resultValue;
@@ -22,6 +23,7 @@ public class ResultDTO {
     public static ResultDTO fromEntity(Result r) {
         return new ResultDTO(
             r.getId(),
+            r.getUserId(),
             r.getAnalysis().getName(),
             r.getLab().getName(),
             r.getResultValue(),

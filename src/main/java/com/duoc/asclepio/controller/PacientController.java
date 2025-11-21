@@ -50,7 +50,7 @@ public class PacientController {
 
     @GetMapping("/{id}/results")
     public ResponseEntity<List<ResultDTO>> getResultsByPacient(@PathVariable Long id) {
-        List<Result> results = resultRepository.findByPacientId(id);
+        List<Result> results = resultRepository.findByUserId(id);
 
         List<ResultDTO> dtos = results.stream().map(ResultDTO::fromEntity).toList();
 
