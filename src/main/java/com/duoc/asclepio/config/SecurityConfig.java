@@ -1,5 +1,7 @@
 package com.duoc.asclepio.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -10,12 +12,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.duoc.asclepio.utils.JwtAuthenticationFilter;
+
 import java.util.List;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private JwtAuthenticationFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -47,5 +53,15 @@ public class SecurityConfig {
 
         return source;
     }
+
+        @Bean
+        // INTERCEPTOR DE RUTAS
+        public FilterRegistrationBean<JwtAuthenticationFilter> jwtFilterBean() {
+            FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>();
+            bean.setFilter(jwtFilter);
+            bean.addUrlPatterns("/*"); 
+            bean.setOrder(1);
+            return bean;
+        }
 
 }

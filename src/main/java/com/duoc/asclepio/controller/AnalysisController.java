@@ -6,6 +6,8 @@ import com.duoc.asclepio.models.Analysis;
 import com.duoc.asclepio.models.Lab;
 import com.duoc.asclepio.repository.AnalysisRepository;
 import com.duoc.asclepio.repository.LabRepository;
+import com.duoc.asclepio.security.AllowedRoles;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,6 +64,7 @@ public class AnalysisController {
 
     // Obtener análisis por ID
     @GetMapping("/{id}")
+    @AllowedRoles({"ADMIN", "PACIENTE"})
     public ResponseEntity<ApiResponse<AnalysisDTO>> getAnalysisById(@PathVariable Long id) {
         Optional<Analysis> analysisOpt = analysisRepository.findById(id);
         if (analysisOpt.isEmpty()) {
@@ -73,6 +76,7 @@ public class AnalysisController {
 
     // Obtener análisis por laboratorio
     @GetMapping("/by-lab/{labId}")
+    @AllowedRoles({"ADMIN", "PACIENTE"})
     public ResponseEntity<ApiResponse<List<AnalysisDTO>>> getAnalysesByLab(@PathVariable Long labId) {
         Optional<Lab> labOpt = labRepository.findById(labId);
         if (labOpt.isEmpty()) {
@@ -89,6 +93,7 @@ public class AnalysisController {
 
     // Actualizar análisis
     @PutMapping("/{id}")
+    @AllowedRoles({"ADMIN"})
     public ResponseEntity<ApiResponse<AnalysisDTO>> updateAnalysis(@PathVariable Long id, @RequestBody AnalysisRequestDTO request) {
         Optional<Analysis> analysisOpt = analysisRepository.findById(id);
         if (analysisOpt.isEmpty()) {
@@ -116,6 +121,7 @@ public class AnalysisController {
 
     // Eliminar análisis
     @DeleteMapping("/{id}")
+    @AllowedRoles({"ADMIN"})
     public ResponseEntity<ApiResponse<Void>> deleteAnalysis(@PathVariable Long id) {
         if (!analysisRepository.existsById(id)) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Análisis no encontrado", null));

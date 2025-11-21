@@ -3,6 +3,8 @@ package com.duoc.asclepio.controller;
 import com.duoc.asclepio.dto.*;
 import com.duoc.asclepio.models.Lab;
 import com.duoc.asclepio.repository.LabRepository;
+import com.duoc.asclepio.security.AllowedRoles;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +42,7 @@ public class LabController {
     }
 
     // Obtener todos los laboratorios
+    @AllowedRoles({"ADMIN","PACIENTE"})
     @GetMapping
     public ResponseEntity<ApiResponse<List<LabDTO>>> getAllLabs() {
         List<LabDTO> labs = labRepository.findAll().stream()
@@ -50,6 +53,7 @@ public class LabController {
     }
 
     // Obtener laboratorio por ID
+    @AllowedRoles({"ADMIN","PACIENTE"})
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<LabDTO>> getLabById(@PathVariable Long id) {
         Optional<Lab> labOpt = labRepository.findById(id);
@@ -64,6 +68,7 @@ public class LabController {
     }
 
     // Actualizar laboratorio
+    @AllowedRoles({"ADMIN"})
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<LabDTO>> updateLab(@PathVariable Long id, @RequestBody LabRequestDTO dto) {
         Optional<Lab> labOpt = labRepository.findById(id);
@@ -84,6 +89,7 @@ public class LabController {
     }
 
     // Eliminar laboratorio
+    @AllowedRoles({"ADMIN"})
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteLab(@PathVariable Long id) {
         if (!labRepository.existsById(id)) {

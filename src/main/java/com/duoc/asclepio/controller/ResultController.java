@@ -15,6 +15,7 @@ import com.duoc.asclepio.dto.ResultCreateDTO;
 import com.duoc.asclepio.dto.ResultDTO;
 import com.duoc.asclepio.models.Result;
 import com.duoc.asclepio.repository.ResultRepository;
+import com.duoc.asclepio.security.AllowedRoles;
 import com.duoc.asclepio.services.ResultService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class ResultController {
     private final ResultRepository resultRepository;
 
     @PostMapping
+    @AllowedRoles({"ADMIN","PACIENTE"})
     public ResponseEntity<ApiResponse<ResultDTO>> create(@RequestBody ResultCreateDTO dto) {
 
         ResultDTO created = resultService.create(dto);
@@ -38,6 +40,7 @@ public class ResultController {
     }
 
     @GetMapping("/by-user/{userId}")
+    @AllowedRoles({"ADMIN","PACIENTE"})
     public ResponseEntity<ApiResponse<List<ResultDTO>>> getResultsByUser(@PathVariable Long userId) {
 
         List<Result> results = resultRepository.findByUserId(userId);
