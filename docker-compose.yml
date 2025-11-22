@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    image: asclepio-analysis-management-services-app
+    build:
+      context: .
+    ports:
+      - "8090:8090"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge  
