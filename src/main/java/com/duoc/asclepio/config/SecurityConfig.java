@@ -22,6 +22,7 @@ import java.util.List;
 public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
+    
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

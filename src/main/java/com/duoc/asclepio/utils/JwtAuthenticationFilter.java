@@ -25,17 +25,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Rutas públicas (si tu microserv B las tuviera)
+        // 1. RUTAS PÚBLICAS
         if (path.startsWith("/public") || path.equals("/health")) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // 2. VALIDACIÓN DE COMUNICACIÓN INTERNA (Service-to-Service)
+        // Verificamos si la petición viene de nuestro otro microservicio
+        String internalHeader = request.getHeader("X-Internal-Header");
+        if ("MI_CLAVE_SECRETA_123".equals(internalHeader)) {
+            filterChain.doFilter(request, response); // Deja pasar la petición
+            return; // Termina la ejecución de este filtro para esta petición
+        }
+
+        // 3. VALIDACIÓN DE JWT (Para usuarios/Front-end)
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token faltante o inválido");
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token faltante o inválido\"}");
             return;
         }
 
@@ -45,10 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Claims claims = jwtTokenUtil.extractAllClaims(token);
             request.setAttribute("role", claims.get("role"));
             request.setAttribute("userId", claims.get("userId"));
-
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token inválido: " + e.getMessage());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token inválido: " + e.getMessage() + "\"}");
             return;
         }
 

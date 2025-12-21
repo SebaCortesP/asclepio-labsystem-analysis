@@ -30,7 +30,7 @@ public class ResultService {
                         .orElseThrow(() -> new RuntimeException("Laboratorio no encontrado"));
 
                 Result r = new Result();
-                r.setUserId(dto.getPacientId());  // <-- ESTE ES EL ID EXTERNO
+                r.setUserId(dto.getPacientId());
                 r.setAnalysis(analysis);
                 r.setLab(lab);
                 r.setResultValue(dto.getResultValue());
